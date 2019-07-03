@@ -24,7 +24,7 @@ public class ExcelProcessor {
 		String sfrDel = args[1];
 		Row delRow = null;
 		HSSFWorkbook wb = null;
-
+		
 		try (OutputStream os = new FileOutputStream("workbook.xls")) {
 			DataFormatter dataFormatter = new DataFormatter();
 
@@ -68,6 +68,10 @@ public class ExcelProcessor {
 			int isGrey = 0;
 			while (rows.hasNext()) {
 				Row row = rows.next();
+				if (rows.hasNext()) {
+					row = rows.next();
+				}
+				
 				Iterator<Cell> cells = row.cellIterator();
 				while (cells.hasNext()) {
 					Cell cell = cells.next();
@@ -77,17 +81,19 @@ public class ExcelProcessor {
 						rowToFill = true;
 					}
 					if (rowToFill) {
-						System.out.print(dataFormatter.formatCellValue(cell) + "\t");	
 						if (ca.getColumn() >= 1 && ca.getColumn() <= 9) {
-							CellStyle cs = wb.createCellStyle();
-
-							if ((isGrey) % 2 != 0) {
+							if ((isGrey % 2) == 0) {
+								System.out.println("grey " + ca.getColumn());
+								CellStyle cs = wb.createCellStyle();
 								cs.setFillBackgroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
 								cs.setFillPattern(FillPatternType.BIG_SPOTS);
+								cell.setCellStyle(cs);
 							} else {
+								System.out.println(isGrey + " no fil ");
+								CellStyle cs = wb.createCellStyle();
 								cs.setFillPattern(FillPatternType.NO_FILL);
+								cell.setCellStyle(cs);
 							}
-							cell.setCellStyle(cs);
 						} else {
 							CellStyle cs = wb.createCellStyle();
 							cs.setFillPattern(FillPatternType.NO_FILL);
@@ -96,7 +102,6 @@ public class ExcelProcessor {
 					}
 				}
 				isGrey ++;
-				System.out.println();
 			}
 
 			wb.write(os);
