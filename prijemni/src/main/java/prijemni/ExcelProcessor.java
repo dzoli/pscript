@@ -22,7 +22,10 @@ public class ExcelProcessor {
 	public static void main(String[] args) {
 		String inPath = args[0];
 		String sfrDel = args[1];
+		System.out.println("in = " + inPath);
+		System.out.println("sfrdel = " + sfrDel);
 		Row delRow = null;
+		Row firstStudRow = null;
 		HSSFWorkbook wb = null;
 		
 		try (OutputStream os = new FileOutputStream("workbook.xls")) {
@@ -41,6 +44,9 @@ public class ExcelProcessor {
 					String cellVal = dataFormatter.formatCellValue(cell);
 					if (cellVal.equals(sfrDel)) {
 						delRow = row;
+					}
+					if (cellVal.equals("1.")) {
+						firstStudRow = row;
 					}
 				}
 			}
@@ -63,20 +69,19 @@ public class ExcelProcessor {
 			}
 
 			// row color
-			rows = sheet.rowIterator();
+			idx = firstStudRow.getRowNum();
 			boolean rowToFill = false;
 			int isGrey = 0;
-			while (rows.hasNext()) {
-				Row row = rows.next();
-				if (rows.hasNext()) {
-					row = rows.next();
-				}
+			while (sheet.getRow(idx) != null && sheet.getRow(idx).getCell(1) != null) {
+				Row row = sheet.getRow(idx);
+				idx += 2;
 				
 				Iterator<Cell> cells = row.cellIterator();
 				while (cells.hasNext()) {
 					Cell cell = cells.next();
 					CellAddress ca = cell.getAddress();
 					String cellVal = dataFormatter.formatCellValue(cell);
+					System.out.println(cellVal);
 					if (cellVal.equals("1.")) {
 						rowToFill = true;
 					}
